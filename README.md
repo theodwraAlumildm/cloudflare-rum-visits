@@ -4,20 +4,20 @@
 
 ## Λογική & Στρατηγική
 
-### 1. Χρονική Διαχείριση (Timezone Alignment)
+1. Χρονική Διαχείριση (Timezone Alignment)
 Επειδή το Cloudflare API λειτουργεί αυστηρά σε UTC, το script μετατρέπει την τοπική ώρα (Europe/Athens) σε UTC για να διασφαλίσει ότι το report καλύπτει ακριβώς το 24ωρο της επιλογής μας.
 
-### 2. Chunking (Αποφυγή API Limits & Αντιστοίχιση)
+2. Chunking (Αποφυγή API Limits & Αντιστοίχιση)
 Το GraphQL endpoint έχει όριο 10.000 εγγραφές ανά αίτημα. Χωρίζουμε την ημέρα σε 4 εξάωρα για να μην χάνουμε δεδομένα. 
 
-Για να έχεις το ίδιο αποτέλεσμα με το Cloudflare Dashboard, πρέπει να κατανοήσεις ότι το Dashboard της Cloudflare (στην καρτέλα RUM/Analytics) έχει δύο τρόπους να εμφανίζει τα δεδομένα:
+Για να έχουμε το ίδιο αποτέλεσμα με το Cloudflare Dashboard, λαμβάνουμε υπόψην ότι το Dashboard της Cloudflare έχει δύο τρόπους να εμφανίζει τα δεδομένα:
 
 UTC: Η "μητρική" ζώνη της Cloudflare.
 
-Dashboard Local Time: Η ζώνη που έχεις επιλέξει στις ρυθμίσεις του browser/account σου.
+Dashboard Local Time: Η ζώνη που έχουμε επιλέξει στις ρυθμίσεις του account.
 
 Η Λογική του Script
-Ήδη χρησιμοποιεί την Europe/Athens (GMT+2 ή GMT+3 ανάλογα με τη θερινή ώρα). Το script παίρνει το "χθες" (yesterday) σε τοπική ώρα και το μετατρέπει σε UTC για να ευθυγραμμιστεί με το Dashboard.
+Χρησιμοποιεί την Europe/Athens (GMT+2 ή GMT+3 ανάλογα με τη θερινή ώρα). Το script παίρνει το "χθες" (yesterday) σε τοπική ώρα και το μετατρέπει σε UTC για να ευθυγραμμιστεί με το Dashboard.
 
 Πώς θα είναι τα Timestamps στο Dashboard;
 Αν θέλουμε να βλέπουμε στο Cloudflare Dashboard ακριβώς το ίδιο "χθες" που υπολογίζει το script, πρέπει να προσέξουμε τα εξής:
@@ -26,7 +26,7 @@ Dashboard Local Time: Η ζώνη που έχεις επιλέξει στις ρ
 Το GraphQL της Cloudflare απαιτεί ISO 8601 string. Το script παράγει:
 YYYY-MM-DDTHH:MM:SSZ
 
-Στο Dashboard: Όταν επιλέγουμε "Yesterday" (Χθες), η Cloudflare κάνει αυτόματα το query για το διάστημα 00:00:00 έως 23:59:59 της τοπικής σου ώρας.
+Στο Dashboard: Όταν επιλέγουμε "Yesterday" (Χθες), η Cloudflare κάνει αυτόματα το query για το διάστημα 00:00:00 έως 23:59:59 της τοπικής μας ώρας.
 
 2. Τα "Chunks" (Τα 6ωρα)
 Για να συμπίπτουν οι ώρες με το Dashboard, τα timestamps που παράγει η συνάρτησή local_to_utc_iso πρέπει να αντιστοιχούν σε αυτά:
